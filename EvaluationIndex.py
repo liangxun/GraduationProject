@@ -1,7 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
-plt.rcParams['font.sans-serif']=['SimHei']  #让图例正常显示中文
-plt.rcParams['axes.unicode_minus']=False #用来正常显示负号
+plt.rcParams['font.sans-serif'] = ['SimHei']  # 让图例正常显示中文
+plt.rcParams['axes.unicode_minus'] = False  # 用来正常显示负号
 
 
 class evalueationIndex(object):
