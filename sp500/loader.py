@@ -4,7 +4,8 @@ import matplotlib.pyplot as plt
 
 class DataPreprocess(object):
     def __init__(self):
-        pass
+        self.dim = 1
+        self.normalise_bool = True
 
     def arima_load_data(self,filename,seq_len,normalise_bool=True,row=2000):
         table = pd.read_csv(filename)
@@ -55,8 +56,36 @@ class DataPreprocess(object):
             x_train.shape, y_train.shape, x_test.shape, y_test.shape))
         return [x_train, y_train, x_test, y_test]
 
-    def lstm_load_multidata(self, filename,seq_len,dim=1,normalise_bool=True,row=2000):
-        pass
+    def lstm_load_multidata(self, filename,seq_len,dim=5,normalise_bool=True,row=2000):
+        """LSTM多特征输入"""
+        self.mode = 'lstm_mul'
+        self.dim = dim
+        table = pd.read_csv(filename,index_col='Date')
+        data = np.log(table)
+        if normalise_bool is True:
+            self.max = data.max()
+            self.min = data.min()
+            data = self.normalise(data)
+        data = np.array(data)
+        sequence_length = seq_len + 1
+        result = []
+        for index in range(len(data) - sequence_length):
+            result.append(data[index: index + sequence_length])
+        print("相空间重构后数据集的长度：",len(result))
+        result = np.array(result)
+        train = result[:row, :]
+        print("train set的长度：", row)
+        #np.random.shuffle(train)
+        x_train = train[:, :-1]
+        y_train = train[:, -1, -2]
+        x_test = result[row:, :-1]
+        y_test = result[row:, -1, -2]
+        print("test set的长度：", len(y_test))
+        x_train = np.reshape(x_train, (x_train.shape[0], x_train.shape[1], dim))
+        x_test = np.reshape(x_test, (x_test.shape[0], x_test.shape[1], dim))
+        print("x_train.shape{}\ty_train.shape{}\nx_test.shape{}\ty_test.shape{}\n".format(
+            x_train.shape, y_train.shape, x_test.shape, y_test.shape))
+        return [x_train, y_train, x_test, y_test]
 
     def lstm_load_data(self, filename,seq_len,dim=1,normalise_bool=True,row=2000):
         self.input_dim = dim
@@ -99,9 +128,13 @@ class DataPreprocess(object):
         normalised_data = (data-self.min)/(self.max-self.min)
         return normalised_data
 
-    def unnormalise(self, data):
-        unnormalised_data = data * (self.max-self.min) + self.min
-        return unnormalised_data
+    def unnormalise(self, data, index=-2):
+        """在lstm的输入维度大于2时，需要制定max中那一列是close对应的最小值"""
+        if self.dim is 1:
+            recovered_data = data * (self.max-self.min) + self.min
+        else:
+            recovered_data = data*(self.max[index]-self.min[index])+self.min[index]
+        return recovered_data
 
     def recover(self, data):
         if self.normalise_bool is True:
@@ -112,7 +145,7 @@ class DataPreprocess(object):
 
 def show(data,label='data'):
     plt.figure()
-    plt.plot(data,label=label)
+    plt.plot(data, label=label)
     plt.legend()
     plt.show()
 
