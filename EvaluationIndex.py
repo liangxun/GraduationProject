@@ -14,11 +14,19 @@ class evalueationIndex(object):
         if(true_data.size != prediction.size):
             print('error: true_data.size != prediction.size')
         obj_size = true_data.size
-        #预测误差 e
+
+        # ----这四个指标是list，可以plt
+        # 预测误差 e
         self.e = true_data-prediction
-        #绝对预测误差，可以输出查看plot_ae()
+        # 绝对预测误差
         self.ae = self.e.__abs__()
-        
+        # 百分预测误差 pe
+        self.pe = self.e/true_data * 100
+        # 百分绝对预测误差
+        self.ape = self.pe.__abs__()
+
+        obj_size = true_data.size
+        # ----下面的指标是一个数值
         #平均误差 ME
         self.ME = self.e.sum()/obj_size
         #平均绝对误差 MAE
@@ -27,13 +35,21 @@ class evalueationIndex(object):
         self.MSE = (self.e**2).sum()/obj_size
         #均方根误差 RMSE
         self.RMSE = np.sqrt(self.MSE)
+        # 平均绝对百分误差
+        self.MAPE = self.ape.sum()/obj_size
+
 
     def plot_ae(self):
-        plt.plot(self.ae, label="预测绝对误差")
+        plt.plot(self.ae, label="绝对预测误差")
         plt.legend()
         plt.show()
 
     def plot_e(self):
         plt.plot(self.e, label='预测误差')
+        plt.legend()
+        plt.show()
+
+    def plot_ape(self):
+        plt.plot(self.ape,label='百分绝对预测误差')
         plt.legend()
         plt.show()
