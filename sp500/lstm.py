@@ -5,6 +5,7 @@ from sp500.conf import model_path_mul
 from sp500 import loader
 from sp500 import predict
 from sp500 import lstm_model
+from sp500 import load_demo
 import EvaluationIndex
 
 
@@ -25,18 +26,18 @@ batchsize = 256
 input_dim = 4
 
 input_shape = (timesteps, input_dim)
-layers_output = [64, 128, 1]
-filename = '../dataset/sp2009_dim{}.csv'.format(input_dim)
+layers_output = [64, 1]
+filename = '../dataset/sp2005_dim{}.csv'.format(input_dim)
 
 if __name__ == '__main__':
     global_start_time = time.time()
 
     print('> Loading data... ')
-    DataLoader = loader.DataPreprocess()
-    x_train, y_train, x_test, y_test = DataLoader.lstm_load_multidata(filename,timesteps,dim=input_dim)
-
+    DataLoader = load_demo.DataPreprocess()
+    # x_train, y_train, x_test, y_test = DataLoader.lstm_load_multidata(filename,timesteps,dim=input_dim,normalise_bool=False)
+    x_train, y_train, x_test, y_test = DataLoader.lstm_load_multidata(filename, timesteps, dim=input_dim)
     print('> Data Loaded. Model Compiling...')
-    model, model_name = lstm_model.lstm_2(input_shape, layers_output, lr=lr, dropout=dropout)
+    model, model_name = lstm_model.lstm_1(input_shape, layers_output, lr=lr, dropout=dropout)
     print(model.summary())
     hist = model.fit(
         x_train,
