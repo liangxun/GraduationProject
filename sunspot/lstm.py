@@ -1,10 +1,9 @@
 import time
 import matplotlib.pyplot as plt
 
-from sunspot.loader import DataPreprocess
-from sunspot.conf import sunspot_ms_path, sunspot_model_path
+from sunspot.load_demo import DataPreprocess
 from sunspot import lstm_model
-from sunspot.predict import predict_point_by_point,plot_results_point
+from sunspot.predict import predict_point_by_point, plot_results_point
 import EvaluationIndex
 
 
@@ -18,25 +17,25 @@ def plot_train(history):
 
 # hyperparams
 epochs = 100
-timesteps = 10
+timesteps = 42
 lr = 0.001
 dropout = 0.001
-batchsize = 256
-input_dim = 4
+batchsize = 128
+input_dim = 2
 
-input_shape = (timesteps, input_dim)
 layers_output = [64, 1]
-filename = '../dataset/sunspot_dim{}.csv'.format(input_dim)
-
+input_shape = (timesteps, input_dim)
+filename = '../dataset/sunspot_ms_dim{}.csv'.format(input_dim)
+model_path = './result/{}_dim{}_epoch{}_steps{}_RMSE={:.2f}.h5'
 
 if __name__ == '__main__':
     global_start_time = time.time()
 
     print('> Loading data... ')
     DataLoader = DataPreprocess()
-    x_train, y_train, x_test, y_test = DataLoader.lstm_load_data(sunspot_ms_path, timesteps, row=1686-(timesteps+1))
+    x_train, y_train, x_test, y_test = DataLoader.lstm_load_multidata(filename, timesteps, dim=input_dim, row=1686-(timesteps+1))
     print('> Data Loaded. Compiling...')
-    model, model_name = lstm_model.lstm1(input_shape, layers_output)
+    model, model_name = lstm_model.lstm1(input_shape, layers_output,lr=lr,dropout=dropout)
     print(model.summary())
     hist = model.fit(
         x_train,
@@ -68,4 +67,4 @@ if __name__ == '__main__':
     eI.plot_ape()
 
     print("> Train finished. save model...")
-    model.save(sunspot_model_path.format(model_name, input_dim, epochs, timesteps, eI.RMSE))
+    model.save(model_path.format(model_name, input_dim, epochs, timesteps, eI.RMSE))
