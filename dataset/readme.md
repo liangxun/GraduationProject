@@ -2,7 +2,7 @@
 sunspot_ms.csv
     1855年12月——2017年9月的平滑月均值
     输入特征 = （黑子数）
-sunspot_ms_diff.csv
+sunspot_ms_dim2.csv
     输入特征 = （黑子数，波动）
     （注：波动 = 黑子数 - 上一个月黑子数）
     

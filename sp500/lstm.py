@@ -1,7 +1,6 @@
 import time
 import matplotlib.pyplot as plt
 
-from sp500.conf import model_path_mul
 from sp500 import loader
 from sp500 import predict
 from sp500 import lstm_model
@@ -28,6 +27,7 @@ input_dim = 4
 input_shape = (timesteps, input_dim)
 layers_output = [64, 1]
 filename = '../dataset/sp2005_dim{}.csv'.format(input_dim)
+model_path = './result/{}_dim{}_epoch{}_steps{}_RMSE{:.2f}.h5'
 
 if __name__ == '__main__':
     global_start_time = time.time()
@@ -45,7 +45,7 @@ if __name__ == '__main__':
         batch_size=batchsize,
         nb_epoch=epochs,
         shuffle=True,
-        validation_split=0.05)
+        validation_split=0)
     print('Training duration (s) : ', time.time() - global_start_time)
     plot_train(hist.history)
 
@@ -68,4 +68,4 @@ if __name__ == '__main__':
     eI.plot_ape()
 
     print("> Train finished. save model...")
-    model.save(model_path_mul.format(model_name, input_dim, epochs, timesteps, eI.RMSE))
+    model.save(model_path.format(model_name, input_dim, epochs, timesteps, eI.RMSE))
