@@ -127,14 +127,14 @@ class DataPreprocess(object):
         return [x_train, y_train, x_test, y_test]
 
     def normalise(self, data):
-        """将所以列的数据都归一化到（0,1）"""
+        """将所有列的数据都归一化到（0,1）"""
         normalised_data = (data-self.min)/(self.max-self.min)
         return normalised_data
 
     def unnormalise(self, data):
         """
         只需要恢复close这一列。
-        但lstm的输入维度大于2时，max保存了所有列的最大值，需要指定Close所在列的下标"""
+        当lstm的输入维度大于2时，max保存了所有列的最大值，需要指定Close所在列的下标"""
         if self.dim is 1:
             recovered_data = data * (self.max-self.min) + self.min
         else:
