@@ -2,14 +2,16 @@ import numpy as np
 import pyflux as pf
 import matplotlib.pyplot as plt
 
+from loader import DataPreprocess
 import EvaluationIndex
-from sunspot.loader import DataPreprocess
-from sunspot.conf import sunspot_ms_path
 
 #hyerparams
 ar = 12
 ma = 2
+sunspot_ms_path = '../dataset/sunspot_ms.csv'
 
+# load data
+print(">load data...")
 DataLoader = DataPreprocess()
 data, (train_data, test_data) = DataLoader.arma_load_data(sunspot_ms_path)
 

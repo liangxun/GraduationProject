@@ -3,8 +3,7 @@ import matplotlib.pyplot as plt
 from keras.models import load_model
 
 import EvaluationIndex
-# from sunspot.loader import DataPreprocess
-from sunspot import load_demo
+from loader import DataPreprocess2 as DataPreprocess
 
 
 def predict_point_by_point(model, data):
@@ -36,7 +35,7 @@ if __name__ == '__main__':
     model = load_model(modelpath)
     print(model.summary())
     print('> Loading data... ')
-    DataLoader = load_demo.DataPreprocess()
+    DataLoader = DataPreprocess()
     x_train, y_train, x_test, y_test = DataLoader.lstm_load_multidata(filename=datapath, seq_len=timesteps, dim=input_dim, row=1686-(timesteps+1))
     print('>predict...')
     predictions = predict_point_by_point(model, x_test)
@@ -45,7 +44,6 @@ if __name__ == '__main__':
     eI = EvaluationIndex.evalueationIndex(predictions, y_test)
     print("MSE={}\nRMSE={}\nMAPE={}".format(eI.MSE, eI.RMSE, eI.MAPE))
     plot_results_point(predictions, y_test, eI.RMSE)
-    e = eI.e
     eI.plot_e()
     eI.plot_ae()
     eI.plot_ape()

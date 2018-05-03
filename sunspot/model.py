@@ -10,7 +10,7 @@ os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'  # Hide messy TensorFlow warnings
 warnings.filterwarnings("ignore")   # Hide messy Numpy warnings
 
 
-def lstm2(input_shape, layers, lr=0.001, dropout=0.1):
+def lstm2(input_shape, layers, lr=0.001, dropout=0.01):
     model_name = 'lstm2'
     model = Sequential()
     model.add(LSTM(
@@ -31,7 +31,7 @@ def lstm2(input_shape, layers, lr=0.001, dropout=0.1):
     return model, model_name
 
 
-def lstm1(input_shape, layers_out, lr=0.001, dropout=0.1):
+def lstm1(input_shape, layers_out, lr=0.001, dropout=0.01):
     model_name = 'lstm1'
     model = Sequential()
     model.add(LSTM(
