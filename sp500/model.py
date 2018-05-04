@@ -45,7 +45,7 @@ def lstm_1(input_shape, layers_out, lr=0.001, dropout=0.1):
         activation='linear'
     ))
 
-    model.compile(loss='mse', optimizer=optimizers.rmsprop(lr=lr))
+    model.compile(loss='mae', optimizer=optimizers.rmsprop(lr=lr))
     return model, model_name
 
 

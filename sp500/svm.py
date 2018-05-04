@@ -5,13 +5,13 @@ from sp500 import loader
 import EvaluationIndex
 
 # hyperparams
-seq_len = 50
-filename = '../dataset/sp2005-2015.csv'
+seq_len = 10
+filename = '../dataset/sp2005_dim1.csv'
 
 #train
 DataLoader = loader.DataPreprocess()
 x_train, y_train, x_test, y_test = DataLoader.svm_load_data(filename,seq_len)
-svr = SVR(kernel='rbf', epsilon=0, C=1000)
+svr = SVR(kernel='rbf', epsilon=0.00001, C=100)
 svr.fit(x_train, y_train)
 """
 svr = LinearSVR(epsilon=0.00001, C=1.0)
@@ -31,6 +31,8 @@ plt.plot(prediction, label='predict_data')
 plt.title('the result of svr\nRMSE={:.2f}'.format(eI.RMSE))
 plt.legend()
 plt.show()
+"""
 eI.plot_ae()
 eI.plot_e()
 eI.plot_ape()
+"""

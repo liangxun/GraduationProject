@@ -5,8 +5,8 @@ import matplotlib.pyplot as plt
 from sp500 import loader
 import EvaluationIndex
 
-filename = '../dataset/sp2005-2015.csv'
-seq_len = 50
+filename = '../dataset/sp2005_dim1.csv'
+seq_len = 10
 
 DataLoader = loader.DataPreprocess()
 data, (train_data, test_data) = DataLoader.arima_load_data(filename, seq_len)
@@ -27,3 +27,8 @@ plt.show()
 eI.plot_ae()
 eI.plot_e()
 eI.plot_ape()
+e = eI.e
+from statsmodels.graphics.tsaplots import plot_acf, plot_pacf
+plot_acf(e, lags=50)
+plot_pacf(e, lags=50)
+plt.show()
