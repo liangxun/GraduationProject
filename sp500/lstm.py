@@ -1,10 +1,9 @@
 import time
 import matplotlib.pyplot as plt
 
-from sp500 import loader
+from sp500.loader import DataPreprocess2 as DataPreprocess
 from sp500 import predict
-from sp500 import lstm_model
-from sp500 import load_demo
+from sp500 import model
 import EvaluationIndex
 
 
@@ -17,27 +16,28 @@ def plot_train(history):
 
 
 # hyperparams
-epochs = 150
+epochs = 1
 timesteps = 10
-lr = 0.001
-dropout = 0.001
-batchsize = 256
-input_dim = 4
+lr = 0.002
+dropout = 0.0001
+batchsize = 128
+input_dim = 7
 
 input_shape = (timesteps, input_dim)
-layers_output = [64, 1]
+layers_output = [16, 16, 1]
 filename = '../dataset/sp2005_dim{}.csv'.format(input_dim)
 model_path = './result/{}_dim{}_epoch{}_steps{}_RMSE{:.2f}.h5'
+
 
 if __name__ == '__main__':
     global_start_time = time.time()
 
     print('> Loading data... ')
-    DataLoader = load_demo.DataPreprocess()
-    # x_train, y_train, x_test, y_test = DataLoader.lstm_load_multidata(filename,timesteps,dim=input_dim,normalise_bool=False)
+    DataLoader = DataPreprocess()
     x_train, y_train, x_test, y_test = DataLoader.lstm_load_multidata(filename, timesteps, dim=input_dim)
+
     print('> Data Loaded. Model Compiling...')
-    model, model_name = lstm_model.lstm_1(input_shape, layers_output, lr=lr, dropout=dropout)
+    model, model_name = model.lstm_2(input_shape, layers_output, lr=lr, dropout=dropout)
     print(model.summary())
     hist = model.fit(
         x_train,
@@ -51,8 +51,8 @@ if __name__ == '__main__':
 
     # 在训练集上预测，看是否欠拟合
     predictions = predict.predict_point_by_point(model, x_train)
-    plt.plot(predictions,label='predict')
-    plt.plot(y_train,label='true_data')
+    plt.plot(predictions, label='predict')
+    plt.plot(y_train, label='true_data')
     plt.show()
 
     # 在测试集上预测，计算测量指标
@@ -66,6 +66,7 @@ if __name__ == '__main__':
     eI.plot_ae()
     eI.plot_e()
     eI.plot_ape()
+    eI.correlation()
 
     print("> Train finished. save model...")
     model.save(model_path.format(model_name, input_dim, epochs, timesteps, eI.RMSE))

@@ -10,7 +10,7 @@ seq_len = 50
 
 DataLoader = loader.DataPreprocess()
 data, (train_data, test_data) = DataLoader.arima_load_data(filename, seq_len)
-model = pf.ARIMA(data=data, ar=12, ma=2, family=pf.Normal())
+model = pf.ARIMA(data=data, ar=9, ma=10, family=pf.Normal())
 prediction = np.squeeze(np.array(model.predict_is(h=len(test_data), fit_once=True, fit_method='MLE')))
 
 test_data = DataLoader.recover(test_data)

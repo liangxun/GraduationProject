@@ -60,13 +60,14 @@ class DataPreprocess(object):
         """LSTM多特征输入"""
         self.mode = 'lstm_dim{}'.format(dim)
         self.dim = dim
+        self.normalise_bool = normalise_bool
         table = pd.read_csv(filename,index_col='Date')
         #data = np.log(table)
-        data = table
+        data = (table - np.mean(table))/np.std(table)
+        self.col_close = data.columns.get_loc('Close')
         if normalise_bool is True:
             self.max = data.max()
             self.min = data.min()
-            self.col_close = data.columns.get_loc('Close')
             data = self.normalise(data)
         data = np.array(data)
         sequence_length = seq_len + 1
@@ -91,6 +92,7 @@ class DataPreprocess(object):
 
     def lstm_load_data(self, filename,seq_len,dim=1,normalise_bool=True,row=2000):
         self.input_dim = dim
+        self.normalise_bool = normalise_bool
         table = pd.read_csv(filename)
         table.index = pd.to_datetime(table.Date)
         data = table['Close']
@@ -98,7 +100,6 @@ class DataPreprocess(object):
 
         # normalise range of data to (0,1)
         if normalise_bool is True:
-            self.normalise_bool = normalise_bool
             self.max = data.max()
             self.min = data.min()
             data = self.normalise(data)
@@ -144,10 +145,56 @@ class DataPreprocess(object):
     def recover(self, data):
         if self.normalise_bool is True:
             data = self.unnormalise(data)
-        # recovered_data = np.exp(data)
-        recovered_data = data
+        recovered_data = np.exp(data)
+        #recovered_data = data
         return recovered_data
 
+
+class DataPreprocess2(object):
+    def __init__(self):
+        pass
+
+    def lstm_load_multidata(self, filename, seq_len, dim=2, row=2000):
+        """LSTM多特征输入"""
+        self.mode = 'lstm_dim{}'.format(dim)
+        self.dim = dim
+        table = pd.read_csv(filename, index_col='Date')
+        # 定位收盘价所在列
+        self.col_close = table.columns.get_loc('Close')
+        sequence_length = seq_len + 1
+        result = []
+        info = []
+        """求mean和std时只用到输入部分"""
+        for index in range(len(table) - sequence_length):
+            data = table[index: index + sequence_length]
+            mean = np.mean(data[:-1])
+            std = np.std(data[:-1])
+            data = (data - mean)/std
+            info.append((mean[self.col_close], std[self.col_close]))
+            result.append(data.values)
+        print("相空间重构后数据集的长度：", len(result))
+        result = np.array(result)
+        train = result[:row, :]
+        print("train set的长度：", row)
+        #输入多维特征，但输出依旧是只有close一维
+        x_train = train[:, :-1]
+        y_train = train[:, -1, self.col_close]
+        x_test = result[row:, :-1]
+        y_test = result[row:, -1, self.col_close]
+        self.testinfo = info[row:]
+        print("test set的长度：", len(y_test))
+        x_train = np.reshape(x_train, (x_train.shape[0], x_train.shape[1], dim))
+        x_test = np.reshape(x_test, (x_test.shape[0], x_test.shape[1], dim))
+        print("x_train.shape{}\ty_train.shape{}\nx_test.shape{}\ty_test.shape{}\n".format(
+            x_train.shape, y_train.shape, x_test.shape, y_test.shape))
+        return [x_train, y_train, x_test, y_test]
+
+
+    def recover(self, data):
+        info = self.testinfo
+        for i in range(len(data)):
+            data[i] = data[i] * info[i][1] + info[i][0]
+        return data
 
 def show(data,label='data'):
     plt.figure()
