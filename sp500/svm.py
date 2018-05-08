@@ -6,11 +6,11 @@ import EvaluationIndex
 
 # hyperparams
 seq_len = 50
-filename = '../dataset/sp2005-2015.csv'
+datapath = '../dataset/sp2005-2015.csv'
 
 #train
 DataLoader = loader.DataPreprocess()
-x_train, y_train, x_test, y_test = DataLoader.svm_load_data(filename,seq_len)
+x_train, y_train, x_test, y_test = DataLoader.svm_load_data(datapath,seq_len)
 svr = SVR(kernel='rbf', epsilon=0, C=1000)
 svr.fit(x_train, y_train)
 """
